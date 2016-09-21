@@ -1,0 +1,1 @@
+### Fashioncloud - Coding Challenge - Cache API ###

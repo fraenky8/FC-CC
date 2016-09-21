@@ -4,13 +4,14 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var db = require('./libs/db');
 
 // error handlers
 var error404Handler = require('./middlewares/errorhandler/error404');
 var devErrorHandler = require('./middlewares/errorhandler/developmentErrorHandler');
 var prodErrorHandler = require('./middlewares/errorhandler/productionErrorHandler');
 
-var restApi = require('./routes/keys');
+var restApi = require('./routes/api');
 
 var app = express();
 
@@ -35,7 +36,7 @@ app.use(error404Handler);
 
 // development error handler
 // will print stacktrace
-if (app.get('NODE_ENV') === 'development')
+if (process.env.NODE_ENV === 'development')
 {
     app.use(devErrorHandler);
 }
@@ -43,6 +44,16 @@ if (app.get('NODE_ENV') === 'development')
 // production error handler
 // no stacktraces leaked to user
 app.use(prodErrorHandler);
+
+db.connect(function (err)
+{
+    if (err) throw err;
+
+    if (process.env.NODE_ENV === 'development')
+    {
+        db.initData();
+    }
+});
 
 
 module.exports = app;

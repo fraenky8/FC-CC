@@ -45,6 +45,8 @@ describe('/keys', function ()
             .end(function (err, res)
             {
                 if (err) throw err;
+
+                // TODO check keys
             });
         });
     });
@@ -60,6 +62,8 @@ describe('/keys', function ()
             .end(function (err, res)
             {
                 if (err) throw err;
+
+                // TODO check key
             });
         });
     });

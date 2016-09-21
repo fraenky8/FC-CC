@@ -45,6 +45,7 @@ if (process.env.NODE_ENV === 'development')
 // no stacktraces leaked to user
 app.use(prodErrorHandler);
 
+// setup mongodb
 db.connect(function (err)
 {
     if (err) throw err;
@@ -54,6 +55,5 @@ db.connect(function (err)
         db.initData();
     }
 });
-
 
 module.exports = app;

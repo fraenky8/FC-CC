@@ -12,6 +12,8 @@
         {
             MongoClient.connect(url, function (err, db)
             {
+                // make a unique key index
+                db.collection(config.mongodb.collection).createIndex({'key': 1}, {unique: true});
                 dbInstance = db;
                 if (callback) callback(err);
             });
@@ -26,15 +28,14 @@
         },
         initData: function ()
         {
-            // DEBUG
-            console.log('initData');
-            var collection = dbInstance.collection(config.mongodb.collection);
-            collection.drop();
-            collection.insertMany(testData, function (err, result)
+            dbInstance.collection(config.mongodb.collection).drop(function ()
             {
-                // DEBUG
-                console.log(err);
-                console.log(result);
+                dbInstance.collection(config.mongodb.collection).insertMany(testData, function (err, result)
+                {
+                    // DEBUG
+                    console.log(err);
+                    console.log(result);
+                });
             });
         }
     };

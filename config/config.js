@@ -6,7 +6,7 @@ module.exports = {
         // The number of entries allowed in the cache is limited.
         size: 10,
         // Every cached item has a Time To Live (TTL)
-        ttl: 30 // seconds
+        ttl: 30 // maximum duration to live
     },
 
     mongodb: {

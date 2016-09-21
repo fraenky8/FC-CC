@@ -51,12 +51,12 @@ describe('/keys', function ()
         });
     });
 
-    describe('/123', function ()
+    describe('/1', function ()
     {
-        it('should return keys=123', function ()
+        it('should return keys=1', function ()
         {
             request(app)
-            .get('/keys/123')
+            .get('/1')
             .expect('Content-Type', /json/)
             .expect(200)
             .end(function (err, res)

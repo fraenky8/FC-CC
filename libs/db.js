@@ -1,78 +1,50 @@
-(function ()
+var mongodb = require('mongodb');
+var config = require('../config/config');
+
+var server = new mongodb.Server(config.mongodb.host, config.mongodb.port, {
+    auto_reconnect: true,
+    socketOptions: {keepAlive: 1}
+});
+
+var db = new mongodb.Db(config.mongodb.database, server);
+
+db.open(function (err, db)
 {
-    var MongoClient = require('mongodb').MongoClient;
-    var config = require('../config/config');
+    if (err) throw err;
+
+    // DEBUG
+    console.log("Connected to database");
+
+    db.authenticate(config.mongodb.user, config.mongodb.password, function (err, res)
+    {
+        if (err) throw err;
+
+        // DEBUG
+        console.log("Authenticated to database");
+
+        if (process.env.NODE_ENV === 'development')
+        {
+            initData();
+        }
+    });
+});
+
+var initData = function ()
+{
     var testData = require('../config/db_test_data');
 
-    var url = 'mongodb://' + config.mongodb.host + ':' + config.mongodb.port + '/' + config.mongodb.database;
-    var dbInstance;
-
-    module.exports = {
-        connect: function (callback)
+    db.collection(config.mongodb.collection).drop(function ()
+    {
+        db.collection(config.mongodb.collection).insertMany(testData, function (err, result)
         {
-            MongoClient.connect(url, function (err, db)
-            {
-                // make a unique key index
-                db.collection(config.mongodb.collection).createIndex({'key': 1}, {unique: true});
-                dbInstance = db;
-                if (callback) callback(err);
-            });
-        },
-        close: function ()
-        {
-            MongoClient.close();
-        },
-        getDb: function ()
-        {
-            return dbInstance;
-        },
-        initData: function ()
-        {
-            dbInstance.collection(config.mongodb.collection).drop(function ()
-            {
-                dbInstance.collection(config.mongodb.collection).insertMany(testData, function (err, result)
-                {
-                    // DEBUG
-                    console.log(err);
-                    console.log(result);
-                });
-            });
-        }
-    };
+            if (err) throw err;
 
-})();
+            // DEBUG
+            console.log(result);
+        });
+    });
+};
 
-// module.exports = {
-//     connect: function (callback)
-//     {
-//         MongoClient.connect(url, function (err, db)
-//         {
-//             dbInstance = db;
-//             return callback(err);
-//         });
-//     },
-//     close: function ()
-//     {
-//         MongoClient.close();
-//     },
-//     getDb: function ()
-//     {
-//         return dbInstance;
-//     },
-//     initData: function ()
-//     {
-//         // DEBUG
-//         console.log('initData');
-//         var collection = dbInstance.collection(config.mongodb.collection);
-//         collection.drop();
-//         collection.insertMany(testData, function (err, result)
-//         {
-//             // DEBUG
-//             console.log(err);
-//             console.log(result);
-//         });
-//     }
-// };
-
+module.exports = db;
 
 

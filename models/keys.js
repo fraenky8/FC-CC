@@ -2,31 +2,30 @@ var db = require('../libs/db');
 var config = require('../config/config');
 var utils = require('../utils/utils');
 
-// TODO update TTL
-
 module.exports = {
     getAllStoredKeys: function (callback)
     {
-        return db.getDb().collection(config.mongodb.collection).find({}, {
-            key: 1,
-            _id: 0
-        }).toArray(callback);
+        return db.collection(config.mongodb.collection).find(
+          {},
+          {
+              key: 1,
+              _id: 0
+          }).toArray(callback);
     },
 
     getStoredKey: function (key, callback)
     {
-        return db.getDb().collection(config.mongodb.collection).find({key: key}).limit(1).toArray(callback);
+        return db.collection(config.mongodb.collection).find({key: key}).limit(1).toArray(callback);
     },
 
     createNewKey: function (data, callback)
     {
-        // TODO add cache limit specified in config file --> remove oldest cache item
-        return db.getDb().collection(config.mongodb.collection).insert(data, callback);
+        return db.collection(config.mongodb.collection).insert(data, callback);
     },
 
     updateKeyData: function (key, data, callback)
     {
-        return db.getDb().collection(config.mongodb.collection).findAndModify(
+        return db.collection(config.mongodb.collection).findAndModify(
           {key: key},
           [],
           {
@@ -36,16 +35,36 @@ module.exports = {
               }
           },
           {new: true},
-          callback);
+          callback
+        );
+    },
+
+    updateTTL: function (key, ttl, callback)
+    {
+        return db.collection(config.mongodb.collection).update(
+          {key: key},
+          {
+              $set: {
+                  ttl: parseInt(ttl, 10)
+              }
+          },
+          {},
+          callback
+        );
     },
 
     deleteKey: function (key, callback)
     {
-        return db.getDb().collection(config.mongodb.collection).remove({key: key}, callback)
+        return db.collection(config.mongodb.collection).findAndRemove(
+          {key: key},
+          [],
+          {},
+          callback
+        );
     },
 
     deleteKeys: function (callback)
     {
-        return db.getDb().collection(config.mongodb.collection).remove({}, callback)
+        return db.collection(config.mongodb.collection).remove({}, {}, callback);
     }
 };

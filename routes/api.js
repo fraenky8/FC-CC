@@ -4,6 +4,8 @@ var keys = require('../models/keys');
 var randomstring = require("randomstring");
 var utils = require('../utils/utils');
 
+var key = 0;
+
 /**
  * Add an endpoint that returns all stored keys in the cache
  */
@@ -18,16 +20,22 @@ router.get('/', function (req, res, next)
 /**
  * Add an endpoint that returns the cached data for a given key
  */
-router.get('/:key', function (req, res, next)
+router.get('/:key(\\d+)', function (req, res, next)
 {
-    keys.getStoredKey(req.params.key, function (err, data)
+    key = parseInt(req.params.key, 10);
+
+    keys.getStoredKey(key, function (err, data)
     {
         if (err) return res.json(err);
 
         if (data.length == 1)
         {
             console.log('Cache hit');
-            return res.json(data);
+            keys.updateTTL(key, utils.getCurrentTimestamp(), function (err, cursor)
+            {
+                if (err) return res.json(err);
+            });
+            return res.json(data[0]);
         }
 
         console.log('Cache miss');
@@ -44,8 +52,12 @@ router.get('/:key', function (req, res, next)
 /**
  * Add an endpoint that creates the data for a given key
  */
-router.post('/:key', function (req, res, next)
+router.post('/:key(\\d+)', function (req, res, next)
 {
+    // TODO add cache limit specified in config file --> remove oldest cache item
+
+    key = parseInt(req.params.key, 10);
+
     var newData = {
         key: utils.getRandomInt(10, 100), // TODO query mongodb to get next higher key
         data: randomstring.generate(128),
@@ -62,9 +74,11 @@ router.post('/:key', function (req, res, next)
 /**
  * Add an endpoint that updates the data for a given key
  */
-router.put('/:key/:data', function (req, res, next)
+router.put('/:key(\\d+)/:data', function (req, res, next)
 {
-    keys.updateKeyData(req.params.key, req.params.data, function (err, data)
+    key = parseInt(req.params.key, 10);
+
+    keys.updateKeyData(key, req.params.data, function (err, data)
     {
         if (err) return res.json(err);
 
@@ -75,9 +89,11 @@ router.put('/:key/:data', function (req, res, next)
 /**
  * Add an endpoint that removes a given key from the cache
  */
-router.delete('/:key', function (req, res, next)
+router.delete('/:key(\\d+)', function (req, res, next)
 {
-    keys.deleteKey(req.params.key, function (err, data)
+    key = parseInt(req.params.key, 10);
+
+    keys.deleteKey(key, function (err, data)
     {
         if (err) return res.json(err);
 

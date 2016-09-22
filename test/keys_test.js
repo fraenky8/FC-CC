@@ -1,15 +1,13 @@
 var expect = require('chai').expect;
 var keys = require('../models/keys');
-var db = require('../libs/db').connect();
 
-describe('keys model', function ()
+describe('keys model tests', function ()
 {
     describe('get all keys', function ()
     {
         it('should return all keys', function ()
         {
-            var allKeys = keys.getAllStoredKeys();
-            allKeys.then(function (data)
+            keys.getAllStoredKeys(function (err, data)
             {
                 // TODO expect
                 console.log(data);
@@ -18,15 +16,19 @@ describe('keys model', function ()
         });
     });
 
-    describe('get single key', function ()
+    describe('get single key = 1', function ()
     {
-        it('should return a single key', function ()
+        it('should return a single key=1', function ()
         {
-            var aKey = keys.getStoredKey(1, function (err, data)
+            keys.getStoredKey(1, function (err, data)
             {
                 console.log(err);
                 console.log(data);
+
+                expect(data).not.be.null();
             });
         });
     });
+
+    // TODO add more tests
 });

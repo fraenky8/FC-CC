@@ -1,14 +1,15 @@
-var expect = require('chai').expect;
-var request = require('supertest');
-var app = require('../app');
+'use strict';
+const expect = require('chai').expect;
+const request = require('supertest');
+const app = require('../app');
 
 // TODO add mockup for replacing concrete db
 
-describe('api tests', function ()
+describe('api tests', () =>
 {
-    describe('POST /', function ()
+    describe('POST /', () =>
     {
-        it('should return error object', function ()
+        it('should return error object', () =>
         {
             request(app)
             .post('/keys')
@@ -36,9 +37,9 @@ describe('api tests', function ()
         });
     });
 
-    describe('GET /', function ()
+    describe('GET /', () =>
     {
-        it('should return all present keys', function ()
+        it('should return all present keys', () =>
         {
             request(app)
             .get('/keys')
@@ -57,9 +58,9 @@ describe('api tests', function ()
         });
     });
 
-    describe('GET /1', function ()
+    describe('GET /1', () =>
     {
-        it('should return key=1', function ()
+        it('should return key=1', () =>
         {
             request(app)
             .get('/1')
@@ -92,9 +93,9 @@ describe('api tests', function ()
         });
     });
 
-    describe('POST /999', function ()
+    describe('POST /999', () =>
     {
-        it('should return new key=999', function ()
+        it('should return new key=999', () =>
         {
             request(app)
             .post('/999')
@@ -119,9 +120,9 @@ describe('api tests', function ()
         });
     });
 
-    describe('PUT /1', function ()
+    describe('PUT /1', () =>
     {
-        it('should update key=1', function ()
+        it('should update key=1', () =>
         {
             request(app)
             .put('/1/my-foobar-test-data')
@@ -168,9 +169,9 @@ describe('api tests', function ()
         });
     });
 
-    describe('DELETE /', function ()
+    describe('DELETE /', () =>
     {
-        it('should delete all keys', function ()
+        it('should delete all keys', () =>
         {
             request(app)
             .delete('/1')
@@ -203,9 +204,9 @@ describe('api tests', function ()
         });
     });
 
-    describe('DELETE /1', function ()
+    describe('DELETE /1', () =>
     {
-        it('should delete key=1', function ()
+        it('should delete key=1', () =>
         {
             request(app)
             .delete('/1')

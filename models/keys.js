@@ -1,9 +1,10 @@
-var db = require('../libs/db');
-var config = require('../config/config');
-var utils = require('../utils/utils');
+'use strict';
+const db = require('../libs/db');
+const config = require('../config/config');
+const utils = require('../utils/utils');
 
 module.exports = {
-    getAllStoredKeys: function (callback)
+    getAllStoredKeys: (callback) =>
     {
         return db.collection(config.mongodb.collection).find(
           {},
@@ -13,17 +14,17 @@ module.exports = {
           }).toArray(callback);
     },
 
-    getStoredKey: function (key, callback)
+    getStoredKey: (key, callback) =>
     {
         return db.collection(config.mongodb.collection).find({key: key}).limit(1).toArray(callback);
     },
 
-    createNewKey: function (data, callback)
+    createNewKey: (data, callback) =>
     {
         return db.collection(config.mongodb.collection).insert(data, callback);
     },
 
-    updateKeyData: function (key, data, callback)
+    updateKeyData: (key, data, callback) =>
     {
         return db.collection(config.mongodb.collection).findAndModify(
           {key: key},
@@ -39,7 +40,7 @@ module.exports = {
         );
     },
 
-    updateTTL: function (key, ttl, callback)
+    updateTTL: (key, ttl, callback) =>
     {
         return db.collection(config.mongodb.collection).update(
           {key: key},
@@ -53,7 +54,7 @@ module.exports = {
         );
     },
 
-    deleteKey: function (key, callback)
+    deleteKey: (key, callback) =>
     {
         return db.collection(config.mongodb.collection).findAndRemove(
           {key: key},
@@ -63,7 +64,7 @@ module.exports = {
         );
     },
 
-    deleteKeys: function (callback)
+    deleteKeys: (callback) =>
     {
         return db.collection(config.mongodb.collection).remove({}, {}, callback);
     }

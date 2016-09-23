@@ -1,13 +1,14 @@
-var expect = require('chai').expect;
-var keys = require('../models/keys');
+'use strict';
+const expect = require('chai').expect;
+const keys = require('../models/keys');
 
-describe('keys model tests', function ()
+describe('keys model tests', () =>
 {
-    describe('get all keys', function ()
+    describe('get all keys', () =>
     {
-        it('should return all keys', function ()
+        it('should return all keys', () =>
         {
-            keys.getAllStoredKeys(function (err, data)
+            keys.getAllStoredKeys((err, data) =>
             {
                 // TODO expect
                 console.log(data);
@@ -16,11 +17,11 @@ describe('keys model tests', function ()
         });
     });
 
-    describe('get single key = 1', function ()
+    describe('get single key = 1', () =>
     {
-        it('should return a single key=1', function ()
+        it('should return a single key=1', () =>
         {
-            keys.getStoredKey(1, function (err, data)
+            keys.getStoredKey(1, (err, data) =>
             {
                 console.log(err);
                 console.log(data);

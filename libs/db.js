@@ -1,21 +1,22 @@
-var mongodb = require('mongodb');
-var config = require('../config/config');
+'use strict';
+const mongodb = require('mongodb');
+const config = require('../config/config');
 
-var server = new mongodb.Server(config.mongodb.host, config.mongodb.port, {
+const server = new mongodb.Server(config.mongodb.host, config.mongodb.port, {
     auto_reconnect: true,
     socketOptions: {keepAlive: 1}
 });
 
-var db = new mongodb.Db(config.mongodb.database, server);
+const db = new mongodb.Db(config.mongodb.database, server);
 
-db.open(function (err, db)
+db.open((err, db) =>
 {
     if (err) throw err;
 
     // DEBUG
     console.log("Connected to database");
 
-    db.authenticate(config.mongodb.user, config.mongodb.password, function (err, res)
+    db.authenticate(config.mongodb.user, config.mongodb.password, (err, res) =>
     {
         if (err) throw err;
 
@@ -29,13 +30,13 @@ db.open(function (err, db)
     });
 });
 
-var initData = function ()
+function initData()
 {
-    var testData = require('../config/db_test_data');
+    const testData = require('../config/db_test_data');
 
-    db.collection(config.mongodb.collection).drop(function ()
+    db.collection(config.mongodb.collection).drop(() =>
     {
-        db.collection(config.mongodb.collection).insertMany(testData, function (err, result)
+        db.collection(config.mongodb.collection).insertMany(testData, (err, result) =>
         {
             if (err) throw err;
 

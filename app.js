@@ -1,21 +1,22 @@
-var express = require('express');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+'use strict';
+const express = require('express');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
 // error handlers
-var error404Handler = require('./middlewares/errorhandler/error404');
-var devErrorHandler = require('./middlewares/errorhandler/developmentErrorHandler');
-var prodErrorHandler = require('./middlewares/errorhandler/productionErrorHandler');
+const error404Handler = require('./middlewares/errorhandler/error404');
+const devErrorHandler = require('./middlewares/errorhandler/developmentErrorHandler');
+const prodErrorHandler = require('./middlewares/errorhandler/productionErrorHandler');
 
-var app = express();
+let app = express();
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 
-var restApi = require('./routes/api');
+const restApi = require('./routes/api');
 app.use('/', restApi);
 
 // catch 404 and forward to error handler

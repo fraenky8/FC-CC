@@ -6,6 +6,11 @@ var utils = require('../utils/utils');
 
 var key = 0;
 
+var keyToInt = function (key)
+{
+    return parseInt(key, 10);
+};
+
 /**
  * Add an endpoint that returns all stored keys in the cache
  */
@@ -22,7 +27,7 @@ router.get('/', function (req, res, next)
  */
 router.get('/:key(\\d+)', function (req, res, next)
 {
-    key = parseInt(req.params.key, 10);
+    key = keyToInt(req.params.key);
 
     keys.getStoredKey(key, function (err, data)
     {
@@ -44,8 +49,12 @@ router.get('/:key(\\d+)', function (req, res, next)
             data: randomstring.generate(128),
             ttl: utils.getCurrentTimestamp()
         };
-        keys.createNewKey(newData);
-        return res.json(newData);
+        keys.createNewKey(newData, function (err, data)
+        {
+            if (err) return res.json(err);
+
+            return res.json(newData);
+        });
     });
 });
 
@@ -56,7 +65,7 @@ router.post('/:key(\\d+)', function (req, res, next)
 {
     // TODO add cache limit specified in config file --> remove oldest cache item
 
-    key = parseInt(req.params.key, 10);
+    key = keyToInt(req.params.key);
 
     var newData = {
         key: utils.getRandomInt(10, 100), // TODO query mongodb to get next higher key
@@ -76,7 +85,7 @@ router.post('/:key(\\d+)', function (req, res, next)
  */
 router.put('/:key(\\d+)/:data', function (req, res, next)
 {
-    key = parseInt(req.params.key, 10);
+    key = keyToInt(req.params.key);
 
     keys.updateKeyData(key, req.params.data, function (err, data)
     {
@@ -91,7 +100,7 @@ router.put('/:key(\\d+)/:data', function (req, res, next)
  */
 router.delete('/:key(\\d+)', function (req, res, next)
 {
-    key = parseInt(req.params.key, 10);
+    key = keyToInt(req.params.key);
 
     keys.deleteKey(key, function (err, data)
     {

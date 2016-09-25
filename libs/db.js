@@ -9,40 +9,48 @@ const server = new mongodb.Server(config.mongodb.host, config.mongodb.port, {
 
 const db = new mongodb.Db(config.mongodb.database, server);
 
-db.open((err, db) =>
+db.open()
+.then(db =>
 {
-    if (err) throw err;
-
     // DEBUG
-    console.log("Connected to database");
+    console.log('Connected to database');
 
-    db.authenticate(config.mongodb.user, config.mongodb.password, (err, res) =>
-    {
-        if (err) throw err;
+    return db.authenticate(config.mongodb.user, config.mongodb.password);
+})
+.then(b => // true
+{
+    // DEBUG
+    console.log('Authenticated to database', b);
 
-        // DEBUG
-        console.log("Authenticated to database");
-
-        if (process.env.NODE_ENV === 'development')
-        {
-            initData();
-        }
-    });
-});
+    if (process.env.NODE_ENV === 'development') initData();
+})
+.catch(err =>
+{
+    // DEBUG
+    console.log('ERROR', err);
+})
+;
 
 function initData()
 {
     const testData = require('../config/db_test_data');
 
-    db.collection(config.mongodb.collection).drop(() =>
+    db
+    .collection(config.mongodb.collection)
+    .drop()
+    .then(b => // true
     {
-        db.collection(config.mongodb.collection).insertMany(testData, (err, result) =>
-        {
-            if (err) throw err;
-
-            // DEBUG
-            console.log(result);
-        });
+        return db.collection(config.mongodb.collection).insertMany(testData);
+    })
+    .then(result => // finalResult-object
+    {
+        // DEBUG
+        console.log(result);
+    })
+    .catch(err =>
+    {
+        // DEBUG
+        console.log('ERROR', err);
     });
 };
 

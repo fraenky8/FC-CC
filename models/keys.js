@@ -60,5 +60,10 @@ module.exports = {
     deleteKeys: () =>
     {
         return db.collection(config.mongodb.collection).deleteMany({});
+    },
+
+    findOldestKey: () =>
+    {
+        return db.collection(config.mongodb.collection).find().sort({'ttl': 1}).limit(1).toArray();
     }
 };

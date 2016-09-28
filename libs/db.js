@@ -43,6 +43,8 @@ function initData()
     .drop()
     .then(b => // true
     {
+        db.collection(config.mongodb.collection).createIndex({key: 1});
+        db.collection(config.mongodb.collection).createIndex({ttl: 1});
         return db.collection(config.mongodb.collection).insertMany(testData);
     })
     .then(result => // finalResult-object

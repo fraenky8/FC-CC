@@ -7,6 +7,9 @@ const server = new mongodb.Server(config.mongodb.host, config.mongodb.port, {
     socketOptions: {keepAlive: 1}
 });
 
+/**
+ * @typedef {mongodb.Db} db
+ */
 const db = new mongodb.Db(config.mongodb.database, server);
 
 db.open()

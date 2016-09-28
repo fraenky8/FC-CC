@@ -11,12 +11,23 @@ function keyToInt(key)
     return parseInt(key, 10);
 };
 
+function createNewKey(key)
+{
+    return {
+        key: key,
+        data: utils.generateRandom128String(),
+        ttl: utils.getCurrentTimestamp()
+    };
+}
+
 /**
  * Add an endpoint that returns all stored keys in the cache
  */
 router.get('/', (req, res, next) =>
 {
-    keys.getAllStoredKeys((err, data) => (err ? res.json(err) : res.json(data)));
+    keys.getAllStoredKeys()
+    .then(data => res.json(data))
+    .catch(err => res.json(err));
 });
 
 /**
@@ -26,25 +37,26 @@ router.get('/:key(\\d+)', (req, res, next) =>
 {
     key = keyToInt(req.params.key);
 
-    keys.getStoredKey(key, (err, data) =>
+    keys.getStoredKey(key)
+    .then(data =>
     {
-        if (err) return res.json(err);
-
         if (data.length == 1)
         {
             console.log('Cache hit');
-            keys.updateTTL(key, utils.getCurrentTimestamp(), (err, cursor) => (err ? res.json(err) : res.json(data[0])));
-            return;
+            keys.updateTTL(key, utils.getCurrentTimestamp())
+            .then(cursor => res.json(data[0]))
+            .catch(err => res.json(err));
+            return data;
         }
 
         console.log('Cache miss');
-        const newData = {
-            key: utils.getRandomInt(10, 100), // TODO query mongodb to get next higher key
-            data: utils.generateRandom128String(),
-            ttl: utils.getCurrentTimestamp()
-        };
-        keys.createNewKey(newData, (err, cursor) => (err ? res.json(err) : res.json(newData)));
-    });
+        const newData = createNewKey(key);
+
+        keys.createNewKey(newData)
+        .then(data => res.json(newData))
+        .catch(err => res.json(err));
+    })
+    .catch(err => res.json(err));
 });
 
 /**
@@ -52,16 +64,30 @@ router.get('/:key(\\d+)', (req, res, next) =>
  */
 router.post('/:key(\\d+)', (req, res, next) =>
 {
-    // TODO add cache limit specified in config file --> remove oldest cache item
-
     key = keyToInt(req.params.key);
 
-    const newData = {
-        key: key,
-        data: utils.generateRandom128String(),
-        ttl: utils.getCurrentTimestamp()
-    };
-    keys.createNewKey(newData, (err, cursor) => (err ? res.json(err) : res.json(newData)));
+    keys.getStoredKey(key)
+    .then(data =>
+    {
+        if (data.length == 1)
+        {
+            return res.json({
+                'error': `item with ${key} already exists!`,
+                'method': req.method,
+                'path': req.path
+            });
+        }
+
+        // TODO add cache limit specified in config file --> remove oldest cache item
+
+
+        const newData = createNewKey(key);
+
+        keys.createNewKey(newData)
+        .then(data => res.json(newData))
+        .catch(err => res.json(err));
+    })
+    .catch(err => res.json(err));
 });
 
 /**
@@ -71,7 +97,9 @@ router.put('/:key(\\d+)/:data', (req, res, next) =>
 {
     key = keyToInt(req.params.key);
 
-    keys.updateKeyData(key, req.params.data, (err, data) => (err ? res.json(err) : res.json(data)));
+    keys.updateKeyData(key, req.params.data)
+    .then(data => res.json(data.value))
+    .catch(err => res.json(err));
 });
 
 /**
@@ -81,7 +109,9 @@ router.delete('/:key(\\d+)', (req, res, next) =>
 {
     key = keyToInt(req.params.key);
 
-    keys.deleteKey(key, (err, data) => (err ? res.json(err) : res.json(data)));
+    keys.deleteKey(key)
+    .then(data => res.json(data.value))
+    .catch(err => res.json(err));
 });
 
 /**
@@ -89,7 +119,9 @@ router.delete('/:key(\\d+)', (req, res, next) =>
  */
 router.delete('/', (req, res, next) =>
 {
-    keys.deleteKeys((err, data) => (err ? res.json(err) : res.json(data)));
+    keys.deleteKeys()
+    .then(data => res.json(data))
+    .catch(err => res.json(err));
 });
 
 module.exports = router;

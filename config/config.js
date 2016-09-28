@@ -12,7 +12,7 @@ const config = {
     },
 
     // free 500MB mongodb @https://mlab.com/
-    // current version 3.0 !
+    // current (28.09.2016) version 3.2.9
     mongodb: {
         host: 'ds035046.mlab.com',
         port: 35046,

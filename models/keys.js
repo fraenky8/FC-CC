@@ -1,71 +1,64 @@
 'use strict';
-const db = require('../libs/db');
 const config = require('../config/config');
+const db = require('../libs/db');
 const utils = require('../utils/utils');
 
 module.exports = {
-    getAllStoredKeys: (callback) =>
+    getAllStoredKeys: () =>
     {
         return db.collection(config.mongodb.collection).find(
           {},
           {
               key: 1,
               _id: 0
-          }).toArray(callback);
+          }).toArray();
     },
 
-    getStoredKey: (key, callback) =>
+    getStoredKey: (key) =>
     {
-        return db.collection(config.mongodb.collection).find({key: key}).limit(1).toArray(callback);
+        return db.collection(config.mongodb.collection).find({key: key}).limit(1).toArray();
     },
 
-    createNewKey: (data, callback) =>
+    createNewKey: (data) =>
     {
-        return db.collection(config.mongodb.collection).insert(data, callback);
+        return db.collection(config.mongodb.collection).insertOne(data);
     },
 
-    updateKeyData: (key, data, callback) =>
+    updateKeyData: (key, data) =>
     {
-        return db.collection(config.mongodb.collection).findAndModify(
+        return db.collection(config.mongodb.collection).findOneAndUpdate(
           {key: key},
-          [],
           {
               $set: {
                   data: data,
                   ttl: utils.getCurrentTimestamp()
               }
           },
-          {new: true},
-          callback
+          {returnOriginal: false}
         );
     },
 
-    updateTTL: (key, ttl, callback) =>
+    updateTTL: (key, ttl) =>
     {
-        return db.collection(config.mongodb.collection).update(
+        return db.collection(config.mongodb.collection).updateOne(
           {key: key},
           {
               $set: {
                   ttl: parseInt(ttl, 10)
               }
-          },
-          {},
-          callback
+          }
         );
     },
 
-    deleteKey: (key, callback) =>
+    deleteKey: (key) =>
     {
-        return db.collection(config.mongodb.collection).findAndRemove(
-          {key: key},
-          [],
-          {},
-          callback
+        return db.collection(config.mongodb.collection).findOneAndDelete(
+          {key: key}
         );
     },
 
-    deleteKeys: (callback) =>
+    deleteKeys: () =>
     {
-        return db.collection(config.mongodb.collection).remove({}, {}, callback);
+        return db.collection(config.mongodb.collection).deleteMany({});
     }
 };

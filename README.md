@@ -1,1 +1,1 @@
-### Fashioncloud - Coding Challenge - Cache API ###
+### FC - Coding Challenge - Cache API ###
